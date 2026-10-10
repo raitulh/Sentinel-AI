@@ -1,0 +1,225 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 480" width="100%" height="100%">
+  <defs>
+    <!-- Background Gradients -->
+    <radialGradient id="bgGrad" cx="50%" cy="30%" r="80%">
+      <stop offset="0%" stop-color="#141E30" />
+      <stop offset="50%" stop-color="#0F172A" />
+      <stop offset="100%" stop-color="#050811" />
+    </radialGradient>
+    <radialGradient id="glowGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#10B981" stop-opacity="0.35" />
+      <stop offset="50%" stop-color="#06B6D4" stop-opacity="0.15" />
+      <stop offset="100%" stop-color="#0F172A" stop-opacity="0" />
+    </radialGradient>
+    <!-- Linear Gradients -->
+    <linearGradient id="shieldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#34D399" />
+      <stop offset="50%" stop-color="#059669" />
+      <stop offset="100%" stop-color="#064E3B" />
+    </linearGradient>
+    <linearGradient id="shieldBorder" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#6EE7B7" />
+      <stop offset="50%" stop-color="#10B981" />
+      <stop offset="100%" stop-color="#047857" />
+    </linearGradient>
+    <linearGradient id="textGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#FFFFFF" />
+      <stop offset="40%" stop-color="#E2E8F0" />
+      <stop offset="80%" stop-color="#34D399" />
+      <stop offset="100%" stop-color="#10B981" />
+    </linearGradient>
+    <linearGradient id="cubeTop" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#06B6D4" />
+      <stop offset="100%" stop-color="#0891B2" />
+    </linearGradient>
+    <linearGradient id="cubeLeft" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0E7490" />
+      <stop offset="100%" stop-color="#155E75" />
+    </linearGradient>
+    <linearGradient id="cubeRight" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0891B2" />
+      <stop offset="100%" stop-color="#164E63" />
+    </linearGradient>
+    <!-- Filters -->
+    <filter id="neonGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="8" result="blur" />
+      <feMerge>
+        <feMergeNode in="blur" />
+        <feMergeNode in="SourceGraphic" />
+      </feMerge>
+    </filter>
+    <filter id="dropShadow" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="16" stdDeviation="20" flood-color="#000000" flood-opacity="0.6" />
+    </filter>
+
+    <style>
+      @keyframes floatSlow {
+        0%, 100% { transform: translateY(0px) rotate(0deg); }
+        50% { transform: translateY(-12px) rotate(1.5deg); }
+      }
+      @keyframes floatReverse {
+        0%, 100% { transform: translateY(0px) rotate(0deg); }
+        50% { transform: translateY(10px) rotate(-2deg); }
+      }
+      @keyframes pulseRing {
+        0% { r: 120px; opacity: 0.8; }
+        50% { r: 160px; opacity: 0.2; }
+        100% { r: 120px; opacity: 0.8; }
+      }
+      @keyframes scanBeam {
+        0% { transform: translateY(-80px); opacity: 0; }
+        50% { opacity: 0.75; }
+        100% { transform: translateY(120px); opacity: 0; }
+      }
+      @keyframes rotateGrid {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+      .floating-shield { animation: floatSlow 6s ease-in-out infinite; }
+      .floating-cube1 { animation: floatReverse 5s ease-in-out infinite; }
+      .floating-cube2 { animation: floatSlow 7s ease-in-out infinite; }
+      .pulse-circle { animation: pulseRing 4s ease-in-out infinite; }
+      .scan-line { animation: scanBeam 3s ease-in-out infinite; }
+      .grid-pulse { animation: rotateGrid 40s linear infinite; }
+    </style>
+  </defs>
+
+  <!-- Background Base -->
+  <rect width="100%" height="100%" fill="url(#bgGrad)" />
+
+  <!-- 3D Perspective Grid Floor -->
+  <g opacity="0.18">
+    <path d="M0,480 L350,260 L850,260 L1200,480 Z" fill="none" stroke="#10B981" stroke-width="1.2" />
+    <path d="M200,480 L420,260 M400,480 L520,260 M600,480 L600,260 M800,480 L680,260 M1000,480 L780,260" stroke="#10B981" stroke-width="1" />
+    <line x1="100" y1="410" x2="1100" y2="410" stroke="#10B981" stroke-width="0.8" />
+    <line x1="200" y1="350" x2="1000" y2="350" stroke="#10B981" stroke-width="0.8" />
+    <line x1="280" y1="300" x2="920" y2="300" stroke="#10B981" stroke-width="0.8" />
+  </g>
+
+  <!-- Ambient Glow Behind Shield -->
+  <circle cx="260" cy="240" r="220" fill="url(#glowGlow)" />
+  <circle class="pulse-circle" cx="260" cy="240" r="140" fill="none" stroke="#10B981" stroke-width="1.5" stroke-dasharray="8 6" opacity="0.4" />
+
+  <!-- LEFT SIDE: 3D Isometric Elements -->
+  <!-- Floating Micro Cube 1 -->
+  <g class="floating-cube1" transform="translate(110, 120)">
+    <!-- Top -->
+    <polygon points="30,0 60,15 30,30 0,15" fill="url(#cubeTop)" />
+    <!-- Left -->
+    <polygon points="0,15 30,30 30,65 0,50" fill="url(#cubeLeft)" />
+    <!-- Right -->
+    <polygon points="30,30 60,15 60,50 30,65" fill="url(#cubeRight)" />
+  </g>
+
+  <!-- Floating Micro Cube 2 -->
+  <g class="floating-cube2" transform="translate(390, 310)">
+    <!-- Top -->
+    <polygon points="25,0 50,12 25,25 0,12" fill="url(#shieldGrad)" />
+    <!-- Left -->
+    <polygon points="0,12 25,25 25,50 0,37" fill="#064E3B" />
+    <!-- Right -->
+    <polygon points="25,25 50,12 50,37 25,50" fill="#047857" />
+  </g>
+
+  <!-- Central 3D Shield Graphic -->
+  <g class="floating-shield" transform="translate(260, 240)" filter="url(#dropShadow)">
+    <!-- Outer Shield Halo Glow -->
+    <path d="M0,-115 C55,-115 105,-85 110,-40 C110,40 45,95 0,125 C-45,95 -110,40 -110,-40 C-105,-85 -55,-115 0,-115 Z"
+          fill="none" stroke="#34D399" stroke-width="2.5" opacity="0.3" filter="url(#neonGlow)" />
+
+    <!-- Main 3D Shield Body -->
+    <path d="M0,-105 C50,-105 95,-75 100,-35 C100,35 40,85 0,115 C-40,85 -100,35 -100,-35 C-95,-75 -50,-105 0,-105 Z"
+          fill="url(#shieldGrad)" stroke="url(#shieldBorder)" stroke-width="4" />
+
+    <!-- Internal Facet Highlight (3D Depth) -->
+    <path d="M0,-105 C40,-105 85,-75 90,-35 C90,30 35,80 0,110 Z"
+          fill="#FFFFFF" opacity="0.12" />
+
+    <!-- Scanner Radar Sweep Line inside Shield -->
+    <line class="scan-line" x1="-80" y1="0" x2="80" y2="0" stroke="#A7F3D0" stroke-width="2.5" filter="url(#neonGlow)" />
+
+    <!-- Shield AI Core Emblem -->
+    <circle cx="0" cy="-5" r="32" fill="#064E3B" stroke="#6EE7B7" stroke-width="2.5" />
+    <path d="M-14,-5 L0,-19 L14,-5 L0,9 Z" fill="#34D399" />
+    <circle cx="0" cy="-5" r="5" fill="#FFFFFF" />
+
+    <!-- Network Circuit Nodes -->
+    <circle cx="-50" cy="-45" r="4" fill="#6EE7B7" />
+    <circle cx="50" cy="-45" r="4" fill="#6EE7B7" />
+    <circle cx="0" cy="65" r="4" fill="#6EE7B7" />
+    <line x1="-50" y1="-45" x2="-25" y2="-15" stroke="#6EE7B7" stroke-width="1.5" stroke-dasharray="3 3" opacity="0.7" />
+    <line x1="50" y1="-45" x2="25" y2="-15" stroke="#6EE7B7" stroke-width="1.5" stroke-dasharray="3 3" opacity="0.7" />
+    <line x1="0" y1="65" x2="0" y2="28" stroke="#6EE7B7" stroke-width="1.5" stroke-dasharray="3 3" opacity="0.7" />
+  </g>
+
+  <!-- RIGHT SIDE: Typography & Highlights -->
+  <!-- Overline Badge -->
+  <g transform="translate(540, 105)">
+    <rect width="265" height="30" rx="15" fill="#064E3B" stroke="#10B981" stroke-width="1.2" opacity="0.85" />
+    <circle cx="16" cy="15" r="5" fill="#34D399" filter="url(#neonGlow)" />
+    <text x="32" y="20" fill="#6EE7B7" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="700" letter-spacing="1.5">EVIDENCE-FIRST SECURITY</text>
+  </g>
+
+  <!-- Main Title -->
+  <text x="540" y="185" fill="url(#textGrad)" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Inter', sans-serif" font-size="54" font-weight="900" letter-spacing="-1">
+    Sentinel<tspan fill="#34D399">AI</tspan>
+  </text>
+
+  <!-- Tagline / Subtitle -->
+  <text x="540" y="230" fill="#94A3B8" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="20" font-weight="400" letter-spacing="0.2">
+    Autonomous App &amp; API Assessment Platform
+  </text>
+  <text x="540" y="260" fill="#64748B" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="15" font-weight="400">
+    Bounded HTTP Scans · Evidence Vault · Retests · Local LLM Remediation
+  </text>
+
+  <!-- Tech Badges Bar -->
+  <g transform="translate(540, 310)">
+    <!-- Badge 1: Ollama Qwen3 -->
+    <g transform="translate(0, 0)">
+      <rect width="170" height="38" rx="8" fill="#1E293B" stroke="#334155" stroke-width="1.2" />
+      <circle cx="20" cy="19" r="6" fill="#F59E0B" />
+      <text x="36" y="24" fill="#F1F5F9" font-family="monospace" font-size="12" font-weight="600">Qwen3:1.7B Local</text>
+    </g>
+
+    <!-- Badge 2: FastAPI -->
+    <g transform="translate(182, 0)">
+      <rect width="135" height="38" rx="8" fill="#1E293B" stroke="#334155" stroke-width="1.2" />
+      <circle cx="20" cy="19" r="6" fill="#009688" />
+      <text x="36" y="24" fill="#F1F5F9" font-family="monospace" font-size="12" font-weight="600">FastAPI 0.115</text>
+    </g>
+
+    <!-- Badge 3: Next.js 16 -->
+    <g transform="translate(329, 0)">
+      <rect width="135" height="38" rx="8" fill="#1E293B" stroke="#334155" stroke-width="1.2" />
+      <circle cx="20" cy="19" r="6" fill="#60A5FA" />
+      <text x="36" y="24" fill="#F1F5F9" font-family="monospace" font-size="12" font-weight="600">Next.js 16 UI</text>
+    </g>
+
+    <!-- Badge 4: Celery + Redis -->
+    <g transform="translate(476, 0)">
+      <rect width="130" height="38" rx="8" fill="#1E293B" stroke="#334155" stroke-width="1.2" />
+      <circle cx="20" cy="19" r="6" fill="#EF4444" />
+      <text x="36" y="24" fill="#F1F5F9" font-family="monospace" font-size="12" font-weight="600">Celery + Redis</text>
+    </g>
+  </g>
+
+  <!-- Metric / Highlights Row -->
+  <g transform="translate(540, 385)">
+    <!-- Stat 1 -->
+    <text x="0" y="22" fill="#34D399" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="24" font-weight="800">14/14</text>
+    <text x="0" y="42" fill="#64748B" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="11" font-weight="600" letter-spacing="0.5">TESTS PASSED</text>
+
+    <!-- Stat 2 -->
+    <text x="140" y="22" fill="#38BDF8" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="24" font-weight="800">0–100</text>
+    <text x="140" y="42" fill="#64748B" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="11" font-weight="600" letter-spacing="0.5">RISK HEURISTIC</text>
+
+    <!-- Stat 3 -->
+    <text x="280" y="22" fill="#A78BFA" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="24" font-weight="800">100%</text>
+    <text x="280" y="42" fill="#64748B" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="11" font-weight="600" letter-spacing="0.5">GET-SAFE BOUNDED</text>
+
+    <!-- Stat 4 -->
+    <text x="430" y="22" fill="#FBBF24" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="24" font-weight="800">Advisory</text>
+    <text x="430" y="42" fill="#64748B" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="11" font-weight="600" letter-spacing="0.5">LOCAL AI RATIONALE</text>
+  </g>
+</svg>

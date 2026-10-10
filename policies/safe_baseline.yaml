@@ -1,0 +1,28 @@
+name: safe_baseline
+version: 1
+purpose: Conservative web-response configuration checks
+methods:
+  - GET
+follow_redirects: false
+active_scanning: false
+forced_browsing: false
+max_pages: 40
+max_request_timeout_seconds: 12
+max_scan_timeout_seconds: 600
+persist_cookie_values: false
+persist_response_bodies: false
+checks:
+  - header.content_security_policy
+  - header.x_content_type_options
+  - header.referrer_policy
+  - header.frame_options
+  - header.permissions_policy
+  - cookie.secure_missing
+  - cookie.httponly_missing
+  - cookie.samesite_missing
+  - disclosure.technology_headers
+  - transport.http_target
+notes:
+  - This profile is not a comprehensive penetration test.
+  - Optional OWASP ZAP integration uses same-scope spidering and passive scanning only.
+  - No finding should be treated as fixed merely because it did not recur in one scan.

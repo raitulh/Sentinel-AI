@@ -1,0 +1,153 @@
+name: sentinelai
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-sentinelai}
+      POSTGRES_USER: ${POSTGRES_USER:-sentinelai}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-sentinelai} -d ${POSTGRES_DB:-sentinelai}"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    networks: [data]
+    security_opt: ["no-new-privileges:true"]
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    command: ["redis-server", "--appendonly", "yes", "--maxmemory", "256mb", "--maxmemory-policy", "noeviction"]
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    networks: [data]
+    security_opt: ["no-new-privileges:true"]
+
+  zap:
+    image: ${ZAP_IMAGE:-ghcr.io/zaproxy/zaproxy:stable}
+    restart: unless-stopped
+    command: ["zap.sh", "-daemon", "-host", "0.0.0.0", "-port", "8080", "-config", "api.key=${ZAP_API_KEY:?Set ZAP_API_KEY in .env}", "-config", "api.addrs.addr.name=.*", "-config", "api.addrs.addr.regex=true", "-config", "connection.timeoutInSecs=12"]
+    networks: [scanner_internal]
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS 'http://127.0.0.1:8080/JSON/core/view/version/?apikey=${ZAP_API_KEY}' >/dev/null"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+      start_period: 45s
+    security_opt: ["no-new-privileges:true"]
+    # No host port is published. Only internal application services can reach the ZAP API.
+
+  api:
+    build:
+      context: ./backend
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-sentinelai}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-sentinelai}
+      REDIS_URL: redis://redis:6379/0
+      FRONTEND_ORIGIN: ${APP_ORIGIN:-http://localhost:3000}
+      DEPLOYMENT_MODE: ${DEPLOYMENT_MODE:-self_hosted}
+      ENVIRONMENT: ${ENVIRONMENT:-production}
+    command: ["sh", "-c", "alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port 8000"]
+    depends_on:
+      db: { condition: service_healthy }
+      redis: { condition: service_healthy }
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health/ready',timeout=3).read()"]
+      interval: 10s
+      timeout: 4s
+      retries: 12
+      start_period: 15s
+    networks: [app_internal, data, model_internal]
+    security_opt: ["no-new-privileges:true"]
+    read_only: true
+    tmpfs: ["/tmp:size=64m,noexec,nosuid"]
+
+  worker:
+    build:
+      context: ./backend
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-sentinelai}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-sentinelai}
+      REDIS_URL: redis://redis:6379/0
+      ZAP_API_URL: http://zap:8080
+      DEPLOYMENT_MODE: ${DEPLOYMENT_MODE:-self_hosted}
+      ENVIRONMENT: ${ENVIRONMENT:-production}
+    command: ["celery", "-A", "app.celery_app.celery_app", "worker", "--loglevel=INFO", "--queues=scans", "--concurrency=${SCAN_MAX_CONCURRENCY:-2}", "--without-gossip", "--without-mingle"]
+    depends_on:
+      db: { condition: service_healthy }
+      redis: { condition: service_healthy }
+      zap: { condition: service_healthy }
+      api: { condition: service_healthy }
+    networks: [data, scanner_internal]
+    security_opt: ["no-new-privileges:true"]
+    read_only: true
+    tmpfs: ["/tmp:size=128m,noexec,nosuid"]
+    deploy:
+      resources:
+        limits:
+          cpus: "2.0"
+          memory: 1536M
+
+  web:
+    build:
+      context: ./frontend
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      BACKEND_INTERNAL_URL: http://api:8000
+      APP_ORIGIN: ${APP_ORIGIN:-http://localhost:3000}
+    ports:
+      - "${WEB_BIND_ADDRESS:-127.0.0.1}:${WEB_PORT:-3000}:3000"
+    depends_on:
+      api: { condition: service_healthy }
+    networks: [app_internal]
+    security_opt: ["no-new-privileges:true"]
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3000/').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 20s
+
+  ollama:
+    image: ollama/ollama:latest
+    profiles: ["local-ai"]
+    restart: unless-stopped
+    volumes:
+      - ollama_data:/root/.ollama
+    networks: [model_internal, ai_egress]
+    security_opt: ["no-new-privileges:true"]
+    deploy:
+      resources:
+        limits:
+          cpus: "3.0"
+          memory: 5G
+    # No host port is published. The API can reach this service only on model_internal.
+
+networks:
+  app_internal:
+    internal: true
+  data:
+    internal: true
+  scanner_internal:
+    # Scanner can reach authorized targets externally; API key service is not published to host.
+    driver: bridge
+  model_internal:
+    internal: true
+  ai_egress:
+    driver: bridge
+
+volumes:
+  postgres_data:
+  redis_data:
+  ollama_data:
